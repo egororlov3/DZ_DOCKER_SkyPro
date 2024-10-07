@@ -3,14 +3,14 @@ from rest_framework.routers import DefaultRouter
 
 from .apps import StudyConfig
 from .views import CourseViewSet, LessonListView, LessonCreateView, LessonRetrieveView, LessonUpdateView, \
-    LessonDestroyView
-
+    LessonDestroyView, PaymentViewSet
 
 app_name = StudyConfig.name
 
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='courses')
+router.register(r'payments', PaymentViewSet, basename='payments')
 
 urlpatterns = [
     path('lessons/', LessonListView.as_view(), name='lesson-list'),

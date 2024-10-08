@@ -1,13 +1,14 @@
 from django.conf import settings
 from django.db import models
 
-from users.models import NULLABLE
+from users.models import NULLABLE, User
 
 
 class Course(models.Model):
     title = models.CharField(max_length=255, verbose_name='название')
     image = models.ImageField(upload_to='study/', **NULLABLE, verbose_name='картинка')
     description = models.TextField(verbose_name='описание')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='автор', **NULLABLE)
 
     def __str__(self):
         return self.title
@@ -18,11 +19,13 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='курсы', default=1)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='курсы',
+                               default=1)
     title = models.CharField(max_length=255, verbose_name='название')
     description = models.TextField(verbose_name='описание')
     image = models.ImageField(upload_to='study/', **NULLABLE, verbose_name='картинка')
     video_url = models.URLField(verbose_name='ссылка на видео', **NULLABLE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='автор', **NULLABLE)
 
     def __str__(self):
         return self.title

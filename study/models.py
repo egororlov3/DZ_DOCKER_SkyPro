@@ -4,6 +4,7 @@ from django.db import models
 from users.models import NULLABLE, User
 
 
+# КУРС
 class Course(models.Model):
     title = models.CharField(max_length=255, verbose_name='название')
     image = models.ImageField(upload_to='study/', **NULLABLE, verbose_name='картинка')
@@ -18,6 +19,20 @@ class Course(models.Model):
         verbose_name_plural = 'курсы'
 
 
+# ПОДПИСКА
+class Subscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс')
+
+    def __str__(self):
+        return f'{self.user.username} subscribed to {self.course.title}'
+
+    class Meta:
+        verbose_name = 'подписка'
+        verbose_name_plural = 'подписки'
+
+
+# УРОК
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons', verbose_name='курсы',
                                default=1)
@@ -35,6 +50,7 @@ class Lesson(models.Model):
         verbose_name_plural = 'уроки'
 
 
+# ПЛАТЕЖ
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
         ('cash', 'Наличные'),

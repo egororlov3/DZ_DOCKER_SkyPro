@@ -1,9 +1,9 @@
 from django_filters import rest_framework as filters
 from rest_framework import viewsets, generics
-from .models import Course, Lesson, Payment
+from .models import Course, Lesson, Payment, Subscription
+from .pagination import StudyPagination
 from .permissions import IsStaff, IsSuper, IsAuthor
-from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
-from rest_framework.permissions import IsAuthenticated
+from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscriptionSerializer
 
 
 # БАЗОВЫЕ ФОРМАТЫ ДЛЯ КОНТРОЛЛЕРОВ
@@ -26,6 +26,7 @@ class CourseListView(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsStaff | IsAuthor]
+    pagination_class = StudyPagination
 
 
 class CourseCreateView(BaseCreateView):
@@ -59,12 +60,27 @@ class CourseDestroyView(generics.DestroyAPIView):
     permission_classes = [IsSuper]
 
 
+# ПОДПИСКА НА КУРС
+class SubscribeCourseView(generics.CreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+
+class UnsubscribeCourseView(generics.DestroyAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+    def get_object(self):
+        return generics.get_object_or_404(self.queryset, user=self.request.user, course=self.kwargs['course_id'])
+
+
 # УРОКИ
 class LessonListView(generics.ListAPIView):
     """Получение списка уроков"""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsStaff | IsAuthor]
+    pagination_class = StudyPagination
 
 
 class LessonCreateView(BaseCreateView):

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_yasg',
 
     'users',
     'study',
@@ -136,3 +137,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ]
 }
+
+STRIPE_SECRET_KEY = 'sk_test_51Q8N2q2LjgCnuIUp3NIVN8NZHs7iVWBUqSfdWeAaKjbRsjXq1xGX1Zc5Jvi1Y7owfPcnM8v35pzYGPo1X0of38ms00w1rh2310'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Q8N2q2LjgCnuIUpzKMf2uI0JnQJaZuSk3dCNx9vDgzIHMLhX3rh4f66u2n6Om4Tbzu7XDYooL14WcbKwHCoJCkS00xCB2mYtx'

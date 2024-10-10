@@ -1,10 +1,10 @@
-from django.urls import path, include
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .apps import StudyConfig
 from .views import LessonListView, LessonCreateView, LessonRetrieveView, LessonUpdateView, \
     LessonDestroyView, PaymentViewSet, CourseListView, CourseCreateView, CourseRetrieveView, CourseUpdateView, \
-    CourseDestroyView, SubscribeCourseView, UnsubscribeCourseView
+    CourseDestroyView, SubscribeCourseView, UnsubscribeCourseView, CreatePaymentIntentView, RetrievePaymentIntentView
 
 app_name = StudyConfig.name
 
@@ -30,4 +30,8 @@ urlpatterns = [
     path('courses/<int:pk>/', CourseRetrieveView.as_view(), name='course-detail'),
     path('courses/<int:pk>/update/', CourseUpdateView.as_view(), name='course-update'),
     path('courses/<int:pk>/delete/', CourseDestroyView.as_view(), name='course-delete'),
+
+    # STRIPE
+    path('payment-intent-create/', CreatePaymentIntentView.as_view(), name='create-payment-intent'),
+    path('payment-intent-retrieve/<str:payment_intent_id>/', RetrievePaymentIntentView.as_view(), name='retrieve-payment-intent'),
 ] + router.urls

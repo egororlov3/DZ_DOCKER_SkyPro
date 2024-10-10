@@ -1,9 +1,51 @@
+import stripe
+from django.conf import settings
 from django_filters import rest_framework as filters
 from rest_framework import viewsets, generics
+from rest_framework.generics import UpdateAPIView, RetrieveAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .models import Course, Lesson, Payment, Subscription
 from .pagination import StudyPagination
 from .permissions import IsStaff, IsSuper, IsAuthor
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscriptionSerializer
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+# ПЛАТЕЖИ STRIPE
+class CreatePaymentIntentView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Получаем сумму и валюту из запроса
+            amount = request.data.get('amount')
+            currency = request.data.get('currency', 'usd')
+
+            # Создаем PaymentIntent через API Stripe
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=currency,
+            )
+
+            return Response({
+                'client_secret': intent['client_secret']
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
+
+class RetrievePaymentIntentView(APIView):
+    def get(self, request, payment_intent_id, *args, **kwargs):
+        try:
+            # Получаем платеж по ID
+            intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+
+            # Возвращаем информацию о платеже
+            return Response({
+                'payment_intent': intent
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 
 # БАЗОВЫЕ ФОРМАТЫ ДЛЯ КОНТРОЛЛЕРОВ
@@ -15,18 +57,13 @@ class BaseCreateView(generics.CreateAPIView):
         serializer.save(author=self.request.user)
 
 
-class BaseRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    """Базовый класс для получения, обновления и удаления объектов."""
-    permission_classes = [IsStaff | IsAuthor]
-
-
 # КУРСЫ
 class CourseListView(generics.ListAPIView):
     """Получение списка курсов"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsStaff | IsAuthor]
     pagination_class = StudyPagination
+    permission_classes = [IsStaff | IsAuthor]
 
 
 class CourseCreateView(BaseCreateView):
@@ -41,16 +78,17 @@ class CourseCreateView(BaseCreateView):
         return self.queryset
 
 
-class CourseRetrieveView(BaseRetrieveUpdateDestroyView):
+class CourseRetrieveView(RetrieveAPIView):
     """Получение определенного курса"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
 
-class CourseUpdateView(BaseRetrieveUpdateDestroyView):
+class CourseUpdateView(UpdateAPIView):
     """Изменение курса"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [IsStaff | IsAuthor]
 
 
 class CourseDestroyView(generics.DestroyAPIView):
@@ -95,16 +133,18 @@ class LessonCreateView(BaseCreateView):
         return self.queryset
 
 
-class LessonRetrieveView(BaseRetrieveUpdateDestroyView):
+class LessonRetrieveView(RetrieveAPIView):
     """Получение определенного урока"""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [IsStaff | IsAuthor]
 
 
-class LessonUpdateView(BaseRetrieveUpdateDestroyView):
+class LessonUpdateView(UpdateAPIView):
     """Изменение урока"""
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [IsStaff | IsAuthor]
 
 
 class LessonDestroyView(generics.DestroyAPIView):

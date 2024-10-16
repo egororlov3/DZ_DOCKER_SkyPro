@@ -9,6 +9,7 @@ from .models import Course, Lesson, Payment, Subscription
 from .pagination import StudyPagination
 from .permissions import IsStaff, IsSuper, IsAuthor
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscriptionSerializer
+from study.tasks import send_subscription_confirmation_email, send_unsubscribe_confirmation_email
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -103,6 +104,12 @@ class SubscribeCourseView(generics.CreateAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
 
+    def perform_create(self, serializer):
+        subscription = serializer.save(user=self.request.user)  # Сохраняем подписку
+
+        # Отправляем письмо после успешной подписки
+        send_subscription_confirmation_email.delay(self.request.user.email, subscription.course.title)
+
 
 class UnsubscribeCourseView(generics.DestroyAPIView):
     queryset = Subscription.objects.all()
@@ -110,6 +117,11 @@ class UnsubscribeCourseView(generics.DestroyAPIView):
 
     def get_object(self):
         return generics.get_object_or_404(self.queryset, user=self.request.user, course=self.kwargs['course_id'])
+
+    def perform_destroy(self, instance):
+        # Отправляем письмо перед удалением подписки
+        send_unsubscribe_confirmation_email.delay(self.request.user.email, instance.course.title)
+        instance.delete()
 
 
 # УРОКИ

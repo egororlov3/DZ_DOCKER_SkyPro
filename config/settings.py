@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'django_celery_beat',
 
     'users',
     'study',
@@ -140,3 +141,35 @@ REST_FRAMEWORK = {
 
 STRIPE_SECRET_KEY = 'sk_test_51Q8N2q2LjgCnuIUp3NIVN8NZHs7iVWBUqSfdWeAaKjbRsjXq1xGX1Zc5Jvi1Y7owfPcnM8v35pzYGPo1X0of38ms00w1rh2310'
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51Q8N2q2LjgCnuIUpzKMf2uI0JnQJaZuSk3dCNx9vDgzIHMLhX3rh4f66u2n6Om4Tbzu7XDYooL14WcbKwHCoJCkS00xCB2mYtx'
+
+
+# Настройки брокера
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+# Настройки для Celery
+
+# URL-адрес для хранения результатов задач
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+# Часовой пояс
+CELERY_TIMEZONE = "Australia/Tasmania"
+
+# Отслеживание начала задач
+CELERY_TASK_TRACK_STARTED = True
+
+# Ограничение времени выполнения задач
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 минут
+
+# Настройки почтового сервера
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'sidxxx3@yandex.ru'
+EMAIL_HOST_PASSWORD = 'rqmusyhgzxjfkblj'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,10 +82,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'skypro_drf',
-        'USER': 'postgres',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': '3219035',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -139,19 +140,18 @@ REST_FRAMEWORK = {
     ]
 }
 
-STRIPE_SECRET_KEY = 'sk_test_51Q8N2q2LjgCnuIUp3NIVN8NZHs7iVWBUqSfdWeAaKjbRsjXq1xGX1Zc5Jvi1Y7owfPcnM8v35pzYGPo1X0of38ms00w1rh2310'
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51Q8N2q2LjgCnuIUpzKMf2uI0JnQJaZuSk3dCNx9vDgzIHMLhX3rh4f66u2n6Om4Tbzu7XDYooL14WcbKwHCoJCkS00xCB2mYtx'
-
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
 
 # Настройки брокера
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 # Настройки для Celery
 
 # URL-адрес для хранения результатов задач
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 # Часовой пояс
 CELERY_TIMEZONE = "Australia/Tasmania"
@@ -172,4 +172,3 @@ EMAIL_HOST_PASSWORD = 'rqmusyhgzxjfkblj'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
-
